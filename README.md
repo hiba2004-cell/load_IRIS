@@ -1,6 +1,6 @@
 # 🌸 Iris Classifier – Machine Learning Project
 
-## 🧠 Description du projet
+##  Description du projet
 Ce projet implémente un modèle de **Machine Learning supervisé** pour la **classification du dataset Iris** de Scikit-learn.  
 L’objectif est de prédire l’espèce d’une fleur (*Iris setosa*, *Iris versicolor*, *Iris virginica*) à partir de ses caractéristiques :  
 - longueur et largeur des sépales  
