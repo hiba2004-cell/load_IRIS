@@ -1,121 +1,140 @@
-# 🌸 Iris Classifier – Machine Learning Project
+# load_iris
 
-##  Description du projet
-Ce projet implémente un modèle de **Machine Learning supervisé** pour la **classification du dataset Iris** de Scikit-learn.  
-L’objectif est de prédire l’espèce d’une fleur (*Iris setosa*, *Iris versicolor*, *Iris virginica*) à partir de ses caractéristiques :  
-- longueur et largeur des sépales  
-- longueur et largeur des pétales
+## Description
 
-Le projet inclut un **modèle d’apprentissage**, une **visualisation des données** et une **interface Streamlit** pour effectuer des prédictions interactives.
+Ce petit projet montre comment charger et exploiter le jeu de données Iris (fichier intégré de scikit-learn). Il contient des étapes de :
+
+* chargement des données,
+* exploration et visualisation basique,
+* préparation (train/test),
+* entraînement d'un modèle simple (ex. : LogisticRegression, RandomForest),
+* évaluation et sauvegarde du modèle.
+
+L'objectif est pédagogique : servir de point de départ pour des TP ou prototypes ML.
 
 ---
 
-## 📂 Structure du projet
+## Prérequis
 
-ris-Classifier/
-│
-├── data/
-│ └── iris.csv
-│
-├── models/
-│ └── iris_model.pkl
-│
-├── notebooks/
-│ └── iris_classifier.ipynb
-│
-├── src/
-│ ├── data_preprocessing.py
-│ ├── model_training.py
-│ ├── evaluation.py
-│ └── predict.py
-│
-├── requirements.txt
+* Python 3.8+
+* Bibliothèques Python :
+
+  * scikit-learn
+  * pandas
+  * numpy
+  * matplotlib
+  * seaborn (optionnel)
+
+Installation rapide :
+
+```bash
+python -m venv venv
+source venv/bin/activate   # macOS / Linux
+venv\Scripts\activate     # Windows
+pip install --upgrade pip
+pip install scikit-learn pandas numpy matplotlib seaborn
+```
+
+---
+
+## Arborescence suggérée
+
+```
+load_iris/
 ├── README.md
-└── app.py
-
+├── requirements.txt
+├── load_iris_example.py
+├── notebooks/
+│   └── EDA_iris.ipynb
+└── models/
+    └── iris_model.pkl
+```
 
 ---
 
-## 🔬 Dataset utilisé
+## Exemple de script (Python)
 
-Le dataset **Iris** est chargé directement depuis **Scikit-learn** :
+Fichier `load_iris_example.py` :
+
 ```python
-## Modèles testés
-
-Plusieurs algorithmes ont été comparés :
-
-Logistic Regression
-
-K-Nearest Neighbors (KNN)
-
-Decision Tree
-
-Random Forest
-
-Le meilleur modèle retenu est la Random Forest, offrant la meilleure précision globale.
-
-## Environnement & dépendances
-Installation
-git clone https://github.com/username/Iris-Classifier.git
-cd Iris-Classifier
-pip install -r requirements.txt
-
-requirements.txt
-scikit-learn
-pandas
-numpy
-matplotlib
-seaborn
-streamlit
-joblib
-
-## Entraînement du modèle
-python src/model_training.py
-
-
-ou via le notebook :
-
-jupyter notebook notebooks/iris_classifier.ipynb
-
-
-Le modèle est sauvegardé dans le dossier models/iris_model.pkl.
-
-## Résultats du modèle
-Métrique	Valeur
-Accuracy	0.97
-F1-score	0.96
-
-Le modèle présente une excellente capacité à distinguer les trois classes d’Iris.
-
-##🖼️ Prédiction sur un nouvel échantillon
-python src/predict.py --sepal_length 5.1 --sepal_width 3.5 --petal_length 1.4 --petal_width 0.2
-
-
-Sortie :
-
-## Prédiction : Iris-setosa
-
-## Interface web (Streamlit)
-
-Une interface Streamlit permet de saisir les valeurs des caractéristiques et d’obtenir instantanément la prédiction du modèle.
-
-Lancer l’application :
-streamlit run app.py
-
-##Améliorations possibles
-
-Intégration d’un modèle SVM optimisé par GridSearchCV
-
-Visualisation 3D interactive des classes
-
-Déploiement sur le web (Streamlit Cloud ou Hugging Face Spaces)
-
-##👩‍💻 Auteur
-
-Nom : Hiba Nadiri
-École : ENSA El Jadida
-Projet : Classification des fleurs Iris avec Scikit-learn
-Date : Octobre 2025
 from sklearn.datasets import load_iris
-data = load_iris()
-X, y = data.data, data.target
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
+import joblib
+
+# Charger les données
+iris = load_iris()
+X = pd.DataFrame(iris.data, columns=iris.feature_names)
+y = pd.Series(iris.target, name='target')
+
+print('Aperçu des features :')
+print(X.head())
+print('\nClasses :', iris.target_names)
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Entraîner un modèle simple
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Évaluer
+y_pred = model.predict(X_test)
+print('\nAccuracy:', accuracy_score(y_test, y_pred))
+print('\nClassification report:\n', classification_report(y_test, y_pred, target_names=iris.target_names))
+
+# Sauvegarder le modèle
+joblib.dump(model, 'models/iris_model.pkl')
+print('\nModèle sauvegardé dans models/iris_model.pkl')
+```
+
+---
+
+## Notions d'exploration (EDA) recommandées
+
+* affichage des 4 features (boxplots / histograms)
+* scatter matrix (pd.plotting.scatter_matrix) ou pairplot seaborn
+* vérifier la distribution par classe
+
+Exemple rapide avec seaborn :
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = X.copy()
+df['target'] = y
+sns.pairplot(df, hue='target', vars=iris.feature_names)
+plt.show()
+```
+
+---
+
+## Conseils pour aller plus loin
+
+* tester plusieurs modèles (SVM, KNN, LogisticRegression)
+* normaliser / standardiser les features (StandardScaler)
+* faire une recherche d'hyperparamètres (GridSearchCV / RandomizedSearchCV)
+* pipeline scikit-learn pour enchaîner preprocessing + modèle
+* sauvegarder et charger modèle avec `joblib` ou `pickle`
+
+---
+
+## Fichiers utiles
+
+* `requirements.txt` : lister les dépendances (ex. : `scikit-learn==1.4.0`, `pandas`, `numpy`, ...)
+* `notebooks/EDA_iris.ipynb` : notebook pour visualisations interactives
+
+---
+
+## Contact
+## 👩‍💻 Auteur
+**Nom :** Hiba Nadiri  
+**École :** ENSA El Jadida  
+**Projet :** Classification des vêtements avec CNN (Fashion MNIST)  
+**Date :** Octobre 2025
+
+Pour toute question ou amélioration proposée, ouvre une issue ou contacte l'auteur.
+
