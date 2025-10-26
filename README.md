@@ -1,4 +1,4 @@
-# load_iris
+# Iris Classifier – Machine Learning Project
 
 ## Description
 
@@ -58,36 +58,61 @@ Fichier `load_iris_example.py` :
 
 ```python
 from sklearn.datasets import load_iris
-import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
-import joblib
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.cluster import KMeans
+from sklearn.metrics import accuracy_score
+from sklearn.mixture import GaussianMixture
 
 # Charger les données
 iris = load_iris()
-X = pd.DataFrame(iris.data, columns=iris.feature_names)
-y = pd.Series(iris.target, name='target')
+X, y = iris.data, iris.target
+print(iris.feature_names)
+print(iris.data)
+print(iris.target)
+print(iris.target_names)
 
-print('Aperçu des features :')
-print(X.head())
-print('\nClasses :', iris.target_names)
+# Define models
+models = {
+    'RandomForestClassifier': RandomForestClassifier(),
+    'LogisticRegression': LogisticRegression(random_state=42, max_iter=200),
+    'KNeighborsClassifier': KNeighborsClassifier(),
+    'DecisionTreeClassifier': DecisionTreeClassifier(max_depth=3, random_state=42),
+    'SVC': SVC(),
+    'GaussianNB': GaussianNB(),
+    'GradientBoostingClassifier': GradientBoostingClassifier(),
+    'LinearDiscriminantAnalysis': LinearDiscriminantAnalysis(),
+    'KMeans': KMeans(n_clusters=3, random_state=42),
+    'Gaussian Mixture Model (GMM)': GaussianMixture(n_components=3, random_state=42)
+    
+}
 
-# Split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+# Split the data (for supervised models only)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-# Entraîner un modèle simple
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+# Train and evaluate
+for name, model in models.items():
+    if name not in ['KMeans', 'Gaussian Mixture Model (GMM)']:
+        # Supervised models
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        print(f"{name} Accuracy: {acc:.2f}")
+    else:
+        # Unsupervised models
+        model.fit(X)
+        print(f"{name} fitted (unsupervised model)")
 
 # Évaluer
-y_pred = model.predict(X_test)
-print('\nAccuracy:', accuracy_score(y_test, y_pred))
-print('\nClassification report:\n', classification_report(y_test, y_pred, target_names=iris.target_names))
-
-# Sauvegarder le modèle
-joblib.dump(model, 'models/iris_model.pkl')
-print('\nModèle sauvegardé dans models/iris_model.pkl')
+prediction = model.predict([[5, 2, 4, 3]])
+print(prediction)
+print(iris.target_names[prediction])
 ```
 
 ---
